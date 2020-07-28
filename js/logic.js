@@ -1,4 +1,5 @@
 let noSquare = 6;
+let statusWin = false;
 const sModes = ["RGB", "CMYK", "HEX"];
 let sMode = sModes[Math.floor(Math.random() * 3)];
 const modes = document.querySelectorAll(".mode");
@@ -7,8 +8,9 @@ const squares = document.querySelectorAll(".square");
 
 document.querySelector("body").onload = () => {
     reset();
-    document.getElementById("description").innerHTML =
-        `Choose the matching coloured square with this <strong>${sMode}</strong> colour code.`;
+    document.getElementById(
+        "description"
+    ).innerHTML = `Choose the matching coloured square with this <strong>${sMode}</strong> colour code.`;
     if (sMode === "RGB") {
         document.getElementById("colorDisplay").textContent = RGB();
     } else if (sMode === "CMYK") {
@@ -44,8 +46,9 @@ for (const mode of modes) {
             sMode = "HEX";
             document.getElementById("colorDisplay").textContent = HEX();
         }
-        document.getElementById("description").innerHTML =
-            `Choose the matching coloured square with this <strong>${sMode}</strong> colour code.`;
+        document.getElementById(
+            "description"
+        ).innerHTML = `Choose the matching coloured square with this <strong>${sMode}</strong> colour code.`;
     });
 }
 
@@ -110,6 +113,7 @@ const HEX = () => {
 };
 
 const right = (rtSquare) => {
+    statusWin = true;
     const squares = document.querySelectorAll(".square");
     for (const square of squares) {
         square.style.backgroundColor = rtSquare.style.backgroundColor;
@@ -126,43 +130,51 @@ const wrong = (square) => {
 
 for (const square of squares) {
     square.addEventListener("click", () => {
-        if (sMode === "RGB") {
-            let col = square.style.backgroundColor;
-            col = col.replace("rgb(", "").replace(")", "").replace(/ /g, "").replace(/,/g, " , ");
-            if (col === document.getElementById("colorDisplay").textContent) {
-                right(square);
+        if (statusWin === false) {
+            if (sMode === "RGB") {
+                let col = square.style.backgroundColor;
+                col = col
+                    .replace("rgb(", "")
+                    .replace(")", "")
+                    .replace(/ /g, "")
+                    .replace(/,/g, " , ");
+                if (col === document.getElementById("colorDisplay").textContent) {
+                    right(square);
+                } else {
+                    wrong(square);
+                }
+            } else if (sMode === "CMYK") {
+                let col = document.getElementById("colorDisplay").textContent;
+                col = col.replace(/ /g, "").split(",");
+                let c = Number(col[0]);
+                let m = Number(col[1]);
+                let y = Number(col[2]);
+                let k = Number(col[3]);
+                let r = Math.round(255 * (1 - c / 100) * (1 - k / 100));
+                let g = Math.round(255 * (1 - m / 100) * (1 - k / 100));
+                let b = Math.round(255 * (1 - y / 100) * (1 - k / 100));
+                if (square.style.backgroundColor === "rgb(" + r + ", " + g + ", " + b + ")") {
+                    right(square);
+                } else {
+                    wrong(square);
+                }
             } else {
-                wrong(square);
-            }
-        } else if (sMode === "CMYK") {
-            let col = document.getElementById("colorDisplay").textContent;
-            col = col.replace(/ /g, "").split(",");
-            let c = Number(col[0]);
-            let m = Number(col[1]);
-            let y = Number(col[2]);
-            let k = Number(col[3]);
-            let r = Math.round(255 * (1 - c / 100) * (1 - k / 100));
-            let g = Math.round(255 * (1 - m / 100) * (1 - k / 100));
-            let b = Math.round(255 * (1 - y / 100) * (1 - k / 100));
-            if (square.style.backgroundColor === "rgb(" + r + ", " + g + ", " + b + ")") {
-                right(square);
-            } else {
-                wrong(square);
+                let col = square.style.backgroundColor;
+                col = col.replace("rgb(", "").replace(")", "").replace(/ /g, "").split(",");
+                let r = parseInt(col[0], 10).toString(16);
+                let g = parseInt(col[1], 10).toString(16);
+                let b = parseInt(col[2], 10).toString(16);
+                r = r.length == 1 ? "0" + r : r;
+                g = g.length == 1 ? "0" + g : g;
+                b = b.length == 1 ? "0" + b : b;
+                if ("#" + r + g + b === document.getElementById("colorDisplay").textContent) {
+                    right(square);
+                } else {
+                    wrong(square);
+                }
             }
         } else {
-            let col = square.style.backgroundColor;
-            col = col.replace("rgb(", "").replace(")", "").replace(/ /g, "").split(",");
-            let r = parseInt(col[0], 10).toString(16);
-            let g = parseInt(col[1], 10).toString(16);
-            let b = parseInt(col[2], 10).toString(16);
-            r = r.length == 1 ? "0" + r : r;
-            g = g.length == 1 ? "0" + g : g;
-            b = b.length == 1 ? "0" + b : b;
-            if ("#" + r + g + b === document.getElementById("colorDisplay").textContent) {
-                right(square);
-            } else {
-                wrong(square);
-            }
+            document.getElementById("reColor").click();
         }
     });
 }
@@ -172,6 +184,7 @@ const reset = () => {
     document.getElementById("reColor").classList.add("btn-primary");
     document.getElementById("reColor").classList.remove("btn-success");
     document.getElementById("reColor").textContent = "Refresh Colours";
+    statusWin = false;
 };
 
 // ----------------------------- DARK MODE ------------------------------
