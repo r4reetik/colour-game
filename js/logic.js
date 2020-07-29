@@ -46,6 +46,7 @@ for (const mode of modes) {
             sMode = "HEX";
             document.getElementById("colorDisplay").textContent = HEX();
         }
+        document.querySelector("body > nav > div > button").click();
         document.getElementById(
             "description"
         ).innerHTML = `Choose the matching coloured square with this <strong>${sMode}</strong> colour code.`;
@@ -62,6 +63,7 @@ for (const level of levels) {
             document.getElementById("hard").style.display = "block";
             noSquare = 6;
         }
+        document.querySelector("body > nav > div > button").click();
         document.getElementById("reColor").click();
     });
 }
